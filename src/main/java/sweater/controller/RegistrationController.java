@@ -2,6 +2,7 @@ package sweater.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import sweater.domain.Role;
@@ -26,11 +27,11 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(User user, Map<String, Object> model) {
+    public String addUser(User user, Model model) {
         User userFromDb = userRepository.findByUsername(user.getUsername());
         if (userFromDb != null) {
-            model.put("message", "User exist!");
-            return "login";
+            model.addAttribute("message", "User exist!");
+            return "registration";
         }
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
