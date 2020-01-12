@@ -8,9 +8,7 @@ import sweater.domain.Role;
 import sweater.domain.RoleGroup;
 import sweater.repos.RoleGroupRepository;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/roleGroup")
