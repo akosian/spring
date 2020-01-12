@@ -1,19 +1,24 @@
 package sweater.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import sweater.domain.Message;
 import sweater.domain.User;
 import sweater.repos.MessageRepository;
 import sweater.repos.UserRepository;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Controller
@@ -22,6 +27,8 @@ public class MainController {
     private MessageRepository messageRepository;
     @Autowired
     private UserRepository userRepository;
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @GetMapping("/")
     public String greeting(Model model) {
@@ -46,8 +53,24 @@ public class MainController {
     }
 
     @PostMapping("/main")
-    public String addMessage(@AuthenticationPrincipal User author, @RequestParam String text, @RequestParam String tag, Model model) {
+    public String addMessage(@AuthenticationPrincipal User author,
+                             @RequestParam String text,
+                             @RequestParam String tag,
+                             @RequestParam("file") MultipartFile file,
+                             Model model) throws IOException {
         Message message = new Message(text, tag, author);
+
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+            String uuidFile = UUID.randomUUID().toString();
+            String fileName = uuidFile + "." + file.getOriginalFilename();
+            file.transferTo(new File(uploadPath + "/" + fileName));
+            message.setFilename(fileName);
+        }
+
         messageRepository.save(message);
         Iterable<Message> messages = messageRepository.findAll();
         model.addAttribute("messages", messages);

@@ -4,7 +4,7 @@
 <@c.page>
     Add new user
     <div>
-        ${message!""}
+        ${message!}
     </div>
     <@l.login "/registration" />
     <a href="/login">Login Page</a>
