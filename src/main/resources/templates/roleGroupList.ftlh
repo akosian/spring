@@ -20,4 +20,9 @@
         </#list>
         </tbody>
     </table>
+    <form>
+        <div>
+            <form><span><a href="/createRole">Create Role Group</a> </span></form>
+        </div>
+    </form>
 </@c.page>
