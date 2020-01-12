@@ -9,10 +9,7 @@ import sweater.domain.Role;
 import sweater.domain.User;
 import sweater.repos.UserRepository;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -40,12 +37,9 @@ public class UserController {
             @RequestParam Map<String, String> form,
             @RequestParam("userId") User user) {
         user.setUsername(username);
-        Set<String> roles = Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
         user.getRoles().clear();
         for (String key : form.keySet()) {
-            if (roles.contains(key)) {
+            if (Role.getRoles().contains(key)) {
                 user.getRoles().add(Role.valueOf(key));
             }
         }

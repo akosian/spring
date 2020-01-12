@@ -5,6 +5,8 @@
     <div>
         <@l.logout />
         <span><a href="/user">User list</a></span>
+        <form><span><a href="/createRole">Create Role Group</a> </span></form>
+        <form><span><a href="/roleGroup">Role Group List</a></span></form>
     </div>
     <div>
         <form method="post">
