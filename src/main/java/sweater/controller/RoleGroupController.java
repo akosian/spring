@@ -33,15 +33,21 @@ public class RoleGroupController {
     public String saveRoleGroup(
             @RequestParam String roleGroupName,
             @RequestParam Map<String, String> form,
-            @RequestParam("roleGroupId") RoleGroup roleGroup) {
-        roleGroup.setRoleGroupName(roleGroupName);
-        roleGroup.getRoles().clear();
-        for (String key : form.keySet()) {
-            if (Role.getRoles().contains(key)) {
-                roleGroup.getRoles().add(Role.valueOf(key));
+            @RequestParam("roleGroupId") RoleGroup roleGroup,
+            Model model) {
+        if (roleGroupRepository.findByRoleGroupName(roleGroupName) != null && !roleGroup.getRoleGroupName().equals(roleGroupName)) {
+            model.addAttribute("message", "Role Group with this name already exist.");
+            return roleGroupEdit(roleGroup, model);
+        } else {
+            roleGroup.setRoleGroupName(roleGroupName);
+            roleGroup.getRoles().clear();
+            for (String key : form.keySet()) {
+                if (Role.getRoles().contains(key)) {
+                    roleGroup.getRoles().add(Role.valueOf(key));
+                }
             }
+            roleGroupRepository.save(roleGroup);
+            return "redirect:/roleGroup";
         }
-        roleGroupRepository.save(roleGroup);
-        return "redirect:/roleGroup";
     }
 }

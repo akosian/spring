@@ -8,6 +8,9 @@
             <input class="form-control" id="roleGroupName" type="text" name="roleGroupName"
                    value="${roleGroup.roleGroupName}">
         </div>
+        <div>
+            ${message!}
+        </div>
         <div class="form-group">
             <h5>Roles</h5>
         </div>
@@ -22,7 +25,9 @@
             <input type="hidden" value="${roleGroup.id}" name="roleGroupId">
             <input type="hidden" value="${_csrf.token}" name="_csrf">
             <div class="form-group">
-                <button class="btn btn-primary ml-2" type="button">Save</button>
+                <button class="btn btn-primary ml-2" type="submit">Save</button>
+                <div class="form-group">
+                </div>
             </div>
         </div>
     </form>

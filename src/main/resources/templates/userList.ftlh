@@ -14,7 +14,7 @@
         <#list users as user>
             <tr>
                 <td>${user.username}</td>
-                <td><#list user.roles as role>${role}<#sep>, </#list></td>
+                <td><#list user.roleGroups as roleGroup>${roleGroup}<#sep>, </#list></td>
                 <td><a class="badge badge-primary" href="/user/${user.id}">Edit</a></td>
             </tr>
         </#list>

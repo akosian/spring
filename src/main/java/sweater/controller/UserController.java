@@ -6,10 +6,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import sweater.domain.Role;
+import sweater.domain.RoleGroup;
 import sweater.domain.User;
+import sweater.repos.RoleGroupRepository;
 import sweater.repos.UserRepository;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/user")
@@ -17,6 +21,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RoleGroupRepository roleGroupRepository;
 
     @GetMapping
     public String userList(Model model) {
@@ -27,7 +33,7 @@ public class UserController {
     @GetMapping("{user}")
     public String userEditForm(@PathVariable User user, Model model) {
         model.addAttribute("user", user);
-        model.addAttribute("roles", Role.values());
+        model.addAttribute("roleGroups", roleGroupRepository.findAll());
         return "userEdit";
     }
 
@@ -35,15 +41,29 @@ public class UserController {
     public String userSave(
             @RequestParam String username,
             @RequestParam Map<String, String> form,
-            @RequestParam("userId") User user) {
-        user.setUsername(username);
-        user.getRoles().clear();
-        for (String key : form.keySet()) {
-            if (Role.getRoles().contains(key)) {
-                user.getRoles().add(Role.valueOf(key));
+            @RequestParam("userId") User user,
+            Model model) {
+        if (userRepository.findByUsername(username) != null && !username.equals(user.getUsername())) {
+            model.addAttribute("validationMessage", "User with this name already created.");
+            return userEditForm(user, model);
+        } else {
+            user.setUsername(username);
+            user.getRoles().clear();
+            Iterable<RoleGroup> roleGroups = roleGroupRepository.findAll();
+            Set<String> roleGroupToSet = new HashSet<>();
+            for (String key : form.keySet()) {
+                roleGroups.iterator().forEachRemaining((roleGroup -> {
+                    String roleGroup1 = roleGroup.getRoleGroupName();
+                    String expectedRoleGroup = key;
+                    if (roleGroup1.equals(expectedRoleGroup)) {
+                        user.getRoleGroups().add(roleGroup.getRoleGroupName());
+                        user.getRoles().addAll(roleGroup.getRoles());
+                    }
+                }));
             }
+            user.setRoleGroups(roleGroupToSet);
+            userRepository.save(user);
+            return "redirect:/user";
         }
-        userRepository.save(user);
-        return "redirect:/user";
     }
 }
