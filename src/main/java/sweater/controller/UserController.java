@@ -38,11 +38,7 @@ public class UserController {
     }
 
     @PostMapping
-    public String userSave(
-            @RequestParam String username,
-            @RequestParam Map<String, String> form,
-            @RequestParam("userId") User user,
-            Model model) {
+    public String userSave(@RequestParam String username, @RequestParam Map<String, String> form, @RequestParam("userId") User user, Model model) {
         if (userRepository.findByUsername(username) != null && !username.equals(user.getUsername())) {
             model.addAttribute("validationMessage", "User with this name already created.");
             return userEditForm(user, model);
