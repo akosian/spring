@@ -32,17 +32,25 @@ public class UserService implements UserDetailsService {
         }
         user.setActive(true);
         user.setActivationCode(UUID.randomUUID().toString());
-
         userRepository.save(user);
-
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format("Hello %s! \n" +
-                    " please activate your account by following link http://localhost:8080/activate/%s",
+                            " please activate your account by following link http://localhost:8080/activate/%s",
                     user.getUsername(),
                     user.getActivationCode());
-
-//            mailSender.send();
+            mailSender.send(user.getEmail(), "Activate your Sweater account", message);
         }
+        return true;
+    }
+
+    public boolean activateUser(String code) {
+        User user = userRepository.findByActivationCode(code);
+
+        if (user == null) {
+            return false;
+        }
+        user.setActivationCode(null);
+        userRepository.save(user);
         return true;
     }
 }

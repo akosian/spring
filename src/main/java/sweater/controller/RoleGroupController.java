@@ -1,6 +1,7 @@
 package sweater.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/roleGroup")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class RoleGroupController {
     @Autowired
     private RoleGroupRepository roleGroupRepository;
@@ -27,6 +29,17 @@ public class RoleGroupController {
         model.addAttribute("roleGroup", roleGroup);
         model.addAttribute("roles", Role.values());
         return "roleGroupEdit";
+    }
+
+    @PostMapping("/remove")
+    public String removeRoleGroup(@RequestParam String roleGroupNameToRemove, Model model) {
+        RoleGroup roleGroupToRemove = roleGroupRepository.findByRoleGroupName(roleGroupNameToRemove);
+        if (roleGroupToRemove != null) {
+            roleGroupRepository.delete(roleGroupToRemove);
+        } else {
+            model.addAttribute("deleteFailMessage", String.format("Role group with name - %s doesn't exist.", roleGroupNameToRemove));
+        }
+        return roleGroupList(model);
     }
 
     @PostMapping

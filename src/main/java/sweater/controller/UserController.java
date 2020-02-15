@@ -37,6 +37,17 @@ public class UserController {
         return "userEdit";
     }
 
+    @PostMapping("/remove")
+    public String removeUser(@RequestParam String usernameToRemove, Model model) {
+        User userToRemove = userRepository.findByUsername(usernameToRemove);
+        if (userToRemove != null) {
+            userRepository.delete(userToRemove);
+        } else {
+            model.addAttribute("deleteFailMessage", String.format("User with name - %s doesn't exist.", usernameToRemove));
+        }
+        return userList(model);
+    }
+
     @PostMapping
     public String userSave(@RequestParam String username, @RequestParam Map<String, String> form, @RequestParam("userId") User user, Model model) {
         if (userRepository.findByUsername(username) != null && !username.equals(user.getUsername())) {
@@ -50,8 +61,7 @@ public class UserController {
             for (String key : form.keySet()) {
                 roleGroups.iterator().forEachRemaining((roleGroup -> {
                     String roleGroup1 = roleGroup.getRoleGroupName();
-                    String expectedRoleGroup = key;
-                    if (roleGroup1.equals(expectedRoleGroup)) {
+                    if (roleGroup1.equals(key)) {
                         user.getRoleGroups().add(roleGroup.getRoleGroupName());
                         user.getRoles().addAll(roleGroup.getRoles());
                     }
